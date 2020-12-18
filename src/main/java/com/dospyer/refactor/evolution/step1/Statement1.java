@@ -2,7 +2,7 @@ package com.dospyer.refactor.evolution.step1;
 
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
-import com.dospyer.refactor.bean.Performances;
+import com.dospyer.refactor.bean.Performance;
 import com.dospyer.refactor.bean.Play;
 import com.dospyer.refactor.contants.Contants;
 
@@ -24,12 +24,12 @@ public class Statement1 {
 
         DecimalFormat format = new DecimalFormat("#.00");
 
-        List<Performances> performances = JSON.parseArray(invoice.getString("performances"), Performances.class);
+        List<Performance> performances = JSON.parseArray(invoice.getString("performances"), Performance.class);
 
         int totalAmount = 0;
         int volumeCredits = 0;
 
-        for (Performances perf : performances) {
+        for (Performance perf : performances) {
             Play play = playMap.get(perf.getPlayID());
             int thisAmount;
             switch (play.getType()) {

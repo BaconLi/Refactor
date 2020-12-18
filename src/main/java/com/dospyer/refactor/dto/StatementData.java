@@ -1,9 +1,6 @@
 package com.dospyer.refactor.dto;
 
-import com.dospyer.refactor.bean.Performances;
-import lombok.AllArgsConstructor;
-import lombok.Data;
-import lombok.NoArgsConstructor;
+import lombok.*;
 
 import java.util.List;
 
@@ -14,7 +11,12 @@ import java.util.List;
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
+@RequiredArgsConstructor
 public class StatementData {
+    @NonNull
     private String customer;
-    private List<Performances> Performances;
+    @NonNull
+    private List<PerformanceDto> Performances;
+    private int totalAmount;
+    private int totalVolumeCredits;
 }

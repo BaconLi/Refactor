@@ -2,10 +2,9 @@ package com.dospyer.refactor.evolution.step2;
 
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
-import com.dospyer.refactor.bean.Performances;
+import com.dospyer.refactor.bean.Performance;
 import com.dospyer.refactor.bean.Play;
 import com.dospyer.refactor.contants.Contants;
-import com.dospyer.refactor.evolution.step1.Statement5;
 import com.dospyer.refactor.evolution.step1.Statement6;
 
 import java.text.DecimalFormat;
@@ -52,11 +51,11 @@ public class Statement7 {
 
     private static String getPlainText(JSONObject invoice, Map<String, Play> playMap) {
         String customer = invoice.getString("customer");
-        List<Performances> performances = JSON.parseArray(invoice.getString("performances"), Performances.class);
+        List<Performance> performances = JSON.parseArray(invoice.getString("performances"), Performance.class);
 
         StringBuilder result = new StringBuilder("Statement for ").append(customer).append(Contants.LINE_SEPARATOR);
 
-        for (Performances perf : performances) {
+        for (Performance perf : performances) {
             // print line for this order
             result.append(getPlay(playMap, perf).getName()).append(": ").append(usd(amountFor(playMap, perf))).append(" (").append(perf.getAudience()).append(" seats)").append(Contants.LINE_SEPARATOR);
         }
@@ -69,18 +68,18 @@ public class Statement7 {
     /**
      * 提炼函数后记得要修改函数内部的变量名，以便保持⼀贯的编码⻛格。
      */
-    private static int getTotalAmount(Map<String, Play> playMap, List<Performances> performances) {
+    private static int getTotalAmount(Map<String, Play> playMap, List<Performance> performances) {
         int totalAmount = 0;
-        for (Performances perf : performances) {
+        for (Performance perf : performances) {
             // print line for this order
             totalAmount += amountFor(playMap, perf);
         }
         return totalAmount;
     }
 
-    private static int getTotalVolumeCredits(Map<String, Play> playMap, List<Performances> performances) {
+    private static int getTotalVolumeCredits(Map<String, Play> playMap, List<Performance> performances) {
         int volumeCredits = 0;
-        for (Performances perf : performances) {
+        for (Performance perf : performances) {
             // add volume credits
             volumeCredits += getVolumeCredits(playMap, perf);
         }
@@ -114,7 +113,7 @@ public class Statement7 {
         return format.format(d / 100);
     }
 
-    private static int getVolumeCredits(Map<String, Play> playMap, Performances perf) {
+    private static int getVolumeCredits(Map<String, Play> playMap, Performance perf) {
         int result = 0;
         result += Math.max(perf.getAudience() - 30, 0);
         // add extra credit for every ten comedy attendees
@@ -124,7 +123,7 @@ public class Statement7 {
         return result;
     }
 
-    private static Play getPlay(Map<String, Play> playMap, Performances perf) {
+    private static Play getPlay(Map<String, Play> playMap, Performance perf) {
         return playMap.get(perf.getPlayID());
     }
 
@@ -134,7 +133,7 @@ public class Statement7 {
      * <p>
      * 编码⻛格：永远将函数的返回值命名为“result”，这样我⼀眼就能知道它的作⽤。
      */
-    private static int amountFor(Map<String, Play> playMap, Performances perf) {
+    private static int amountFor(Map<String, Play> playMap, Performance perf) {
         int result;
         switch (getPlay(playMap, perf).getType()) {
             case "tragedy":

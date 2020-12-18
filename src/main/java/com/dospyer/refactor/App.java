@@ -4,6 +4,7 @@ import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
 import com.dospyer.refactor.bean.Play;
 import com.dospyer.refactor.evolution.step1.Statement1;
+import com.dospyer.refactor.evolution.step2.Statement14;
 import com.dospyer.refactor.util.Resource;
 
 import java.io.IOException;
@@ -51,7 +52,7 @@ public class App {
         JSONArray invoiceArray = JSONObject.parseArray(invoices);
         for (int i = 0; i < invoiceArray.size(); i++) {
             JSONObject invoice = invoiceArray.getJSONObject(i);
-            String statement = Statement1.statement(invoice, playMap);
+            String statement = Statement14.statementHtml(invoice, playMap);
             System.out.println(statement);
         }
     }

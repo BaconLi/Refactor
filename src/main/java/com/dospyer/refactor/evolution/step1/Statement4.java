@@ -2,7 +2,7 @@ package com.dospyer.refactor.evolution.step1;
 
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
-import com.dospyer.refactor.bean.Performances;
+import com.dospyer.refactor.bean.Performance;
 import com.dospyer.refactor.bean.Play;
 import com.dospyer.refactor.contants.Contants;
 
@@ -27,14 +27,14 @@ public class Statement4 {
      */
     public static String statement(JSONObject invoice, Map<String, Play> playMap) {
         String customer = invoice.getString("customer");
-        List<Performances> performances = JSON.parseArray(invoice.getString("performances"), Performances.class);
+        List<Performance> performances = JSON.parseArray(invoice.getString("performances"), Performance.class);
 
         StringBuilder result = new StringBuilder("Statement for ").append(customer).append(Contants.LINE_SEPARATOR);
 
         int totalAmount = 0;
         int volumeCredits = 0;
 
-        for (Performances perf : performances) {
+        for (Performance perf : performances) {
             // add volume credits
             volumeCredits += getVolumeCredits(playMap, perf);
             // print line for this order
@@ -65,7 +65,7 @@ public class Statement4 {
         return format.format(d / 100);
     }
 
-    private static int getVolumeCredits(Map<String, Play> playMap, Performances perf) {
+    private static int getVolumeCredits(Map<String, Play> playMap, Performance perf) {
         int result = 0;
         result += Math.max(perf.getAudience() - 30, 0);
         // add extra credit for every ten comedy attendees
@@ -75,7 +75,7 @@ public class Statement4 {
         return result;
     }
 
-    private static Play getPlay(Map<String, Play> playMap, Performances perf) {
+    private static Play getPlay(Map<String, Play> playMap, Performance perf) {
         return playMap.get(perf.getPlayID());
     }
 
@@ -85,7 +85,7 @@ public class Statement4 {
      * <p>
      * 编码⻛格：永远将函数的返回值命名为“result”，这样我⼀眼就能知道它的作⽤。
      */
-    private static int amountFor(Map<String, Play> playMap, Performances perf) {
+    private static int amountFor(Map<String, Play> playMap, Performance perf) {
         int result;
         switch (getPlay(playMap, perf).getType()) {
             case "tragedy":

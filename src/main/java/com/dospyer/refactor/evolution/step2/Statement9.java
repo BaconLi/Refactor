@@ -1,12 +1,15 @@
-package com.dospyer.refactor.evolution.step1;
+package com.dospyer.refactor.evolution.step2;
 
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
 import com.dospyer.refactor.bean.Performance;
 import com.dospyer.refactor.bean.Play;
 import com.dospyer.refactor.contants.Contants;
+import com.dospyer.refactor.dto.PerformanceDto;
+import com.dospyer.refactor.dto.StatementData;
 
 import java.text.DecimalFormat;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
@@ -14,53 +17,68 @@ import java.util.Map;
  * @Author: peigen
  * @Date: 2020/12/17 下午10:02
  */
-public class Statement5 {
+public class Statement9 {
     /**
-     * 重构第四步：{@link Statement4}
-     * 重构第五步
-     * ⽬标是 volumeCredits 。处理这个变量更加微妙，因为它是在循环的迭代过程中累加得到的。
-     * 第⼀步，就是应⽤拆分循环（227）将 volumeCredits 的累加过程分离出来。
-     * 第二步，⽤移动语句（223）⼿法将变量volumeCredits声明挪动到紧邻循环的位置
-     * 第三步，以查询取代临时变量（178）⼿法的施展。第⼀步同样是先对变量的计算过程应⽤提炼函数（106）⼿法。
-     * 第四部，再应⽤内联变量（123）⼿法内联 getTotalVolumeCredits 函数
+     * 重构第八步：{@link Statement8}
+     * 重构第九步
      * <p>
-     * <p>
-     * 思考：
-     * 我知道有些读者会再次对此修改可能带来的性能问题感到担忧。
-     * 我知道很多⼈本能地警惕重复的循环。但⼤多数时候，重复⼀次这样的循环对性能的影响都可忽略不计。
-     * 如果你在重构前后进⾏计时，很可能甚⾄都注意不到运⾏速度的变化——通常也确实没什么变化。
-     * <p>
-     * 许多程序员对代码实际的运⾏路径都所知不⾜，甚⾄经验丰富的程序员有时也未能避免。
-     * 在聪明的编译器、现代的缓存技术⾯前，我们很多直觉都是不准确的。软件的性能通常只与代码的⼀⼩部分相关，改变其他的部分往往对总体性能贡献甚微。
-     * <p>
-     * 当然，“⼤多数时候”不等同于“所有时候”。有时，⼀些重构⼿法也会显著地影响性能。
-     * 但即便如此，我通常也不去管它，继续重构，因为有了⼀份结构良好的代码，回头调优其性能也容易得多。
-     * 如果我在重构时引⼊了明显的性能损耗，我后⾯会花时间进⾏性能调优。
-     * 进⾏调优时，可能会回退我早先做的⼀些重构——但更多时候，因为重构我可以使⽤更⾼效的调优⽅案。最后我得到的是既整洁⼜⾼效的代码。
+     * 将Play对象放到StatementData中
+     * 修改所有getPlay方法调用点为perf.getPlayFor()
      */
     public static String statement(JSONObject invoice, Map<String, Play> playMap) {
         String customer = invoice.getString("customer");
+        List<PerformanceDto> performanceDtos = getPerformanceDtos(invoice, playMap);
+
+        StatementData statementData = new StatementData(customer, performanceDtos);
+        return getPlainText(statementData, playMap);
+    }
+
+    private static List<PerformanceDto> getPerformanceDtos(JSONObject invoice, Map<String, Play> playMap) {
         List<Performance> performances = JSON.parseArray(invoice.getString("performances"), Performance.class);
-
-        StringBuilder result = new StringBuilder("Statement for ").append(customer).append(Contants.LINE_SEPARATOR);
-
-        int totalAmount = 0;
+        List<PerformanceDto> performanceDtos = new ArrayList<>(performances.size());
         for (Performance perf : performances) {
-            // print line for this order
-            result.append(getPlay(playMap, perf).getName()).append(": ").append(usd(amountFor(playMap, perf))).append(" (").append(perf.getAudience()).append(" seats)").append(Contants.LINE_SEPARATOR);
-            totalAmount += amountFor(playMap, perf);
+            PerformanceDto dto = new PerformanceDto();
+            dto.setAudience(perf.getAudience());
+            dto.setPlayID(perf.getPlayID());
+            dto.setPlay(getPlay(playMap, perf));
+            performanceDtos.add(dto);
         }
-        //对应第四部volumeCredits只在45行中使用，应⽤内联变量取消局部变量
-//        int volumeCredits = getTotalVolumeCredits(playMap, performances);
+        return performanceDtos;
+    }
 
-        result.append("Amount owed is ").append(usd(totalAmount)).append(Contants.LINE_SEPARATOR);
-        result.append("You earned ").append(getTotalVolumeCredits(playMap, performances)).append(" credits");
+    private static Play getPlay(Map<String, Play> playMap, Performance perf) {
+        return playMap.get(perf.getPlayID());
+    }
+
+
+    private static String getPlainText(StatementData statementData, Map<String, Play> playMap) {
+        StringBuilder result = new StringBuilder("Statement for ").append(statementData.getCustomer()).append(Contants.LINE_SEPARATOR);
+
+        for (PerformanceDto perf : statementData.getPerformances()) {
+            // print line for this order
+            result.append(perf.getPlay().getName()).append(": ").append(usd(amountFor(playMap, perf))).append(" (").append(perf.getAudience()).append(" seats)").append(Contants.LINE_SEPARATOR);
+        }
+
+        result.append("Amount owed is ").append(usd(getTotalAmount(playMap, statementData.getPerformances()))).append(Contants.LINE_SEPARATOR);
+        result.append("You earned ").append(getTotalVolumeCredits(playMap, statementData.getPerformances())).append(" credits");
         return result.toString();
     }
 
-    private static int getTotalVolumeCredits(Map<String, Play> playMap, List<Performance> performances) {
+    /**
+     * 提炼函数后记得要修改函数内部的变量名，以便保持⼀贯的编码⻛格。
+     */
+    private static int getTotalAmount(Map<String, Play> playMap, List<PerformanceDto> performances) {
+        int totalAmount = 0;
+        for (PerformanceDto perf : performances) {
+            // print line for this order
+            totalAmount += amountFor(playMap, perf);
+        }
+        return totalAmount;
+    }
+
+    private static int getTotalVolumeCredits(Map<String, Play> playMap, List<PerformanceDto> performances) {
         int volumeCredits = 0;
-        for (Performance perf : performances) {
+        for (PerformanceDto perf : performances) {
             // add volume credits
             volumeCredits += getVolumeCredits(playMap, perf);
         }
@@ -94,19 +112,16 @@ public class Statement5 {
         return format.format(d / 100);
     }
 
-    private static int getVolumeCredits(Map<String, Play> playMap, Performance perf) {
+    private static int getVolumeCredits(Map<String, Play> playMap, PerformanceDto perf) {
         int result = 0;
         result += Math.max(perf.getAudience() - 30, 0);
         // add extra credit for every ten comedy attendees
-        if ("comedy".equals(getPlay(playMap, perf).getType())) {
+        if ("comedy".equals(perf.getPlay().getType())) {
             result += Math.floor(perf.getAudience() / 5);
         }
         return result;
     }
 
-    private static Play getPlay(Map<String, Play> playMap, Performance perf) {
-        return playMap.get(perf.getPlayID());
-    }
 
     /**
      * 完成提炼函数后，我会看看提炼出来的函数，看是否能进⼀步提升其表达能⼒。
@@ -114,9 +129,9 @@ public class Statement5 {
      * <p>
      * 编码⻛格：永远将函数的返回值命名为“result”，这样我⼀眼就能知道它的作⽤。
      */
-    private static int amountFor(Map<String, Play> playMap, Performance perf) {
+    private static int amountFor(Map<String, Play> playMap, PerformanceDto perf) {
         int result;
-        switch (getPlay(playMap, perf).getType()) {
+        switch (perf.getPlay().getType()) {
             case "tragedy":
                 result = 40000;
                 if (perf.getAudience() > 30) {
@@ -131,7 +146,7 @@ public class Statement5 {
                 result += 300 * perf.getAudience();
                 break;
             default:
-                throw new RuntimeException("unknown type: " + getPlay(playMap, perf).getType() + "");
+                throw new RuntimeException("unknown type: " + perf.getPlay().getType());
         }
         return result;
     }

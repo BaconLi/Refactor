@@ -2,7 +2,7 @@ package com.dospyer.refactor.evolution.step1;
 
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
-import com.dospyer.refactor.bean.Performances;
+import com.dospyer.refactor.bean.Performance;
 import com.dospyer.refactor.bean.Play;
 import com.dospyer.refactor.contants.Contants;
 
@@ -34,12 +34,12 @@ public class Statement2 {
         StringBuilder result = new StringBuilder("Statement for ").append(customer).append(Contants.LINE_SEPARATOR);
 
         DecimalFormat format = new DecimalFormat("#.00");
-        List<Performances> performances = JSON.parseArray(invoice.getString("performances"), Performances.class);
+        List<Performance> performances = JSON.parseArray(invoice.getString("performances"), Performance.class);
 
         int totalAmount = 0;
         int volumeCredits = 0;
 
-        for (Performances perf : performances) {
+        for (Performance perf : performances) {
             Play play = playMap.get(perf.getPlayID());
             int thisAmount = amountFor(perf, play);
             // add volume credits
@@ -64,7 +64,7 @@ public class Statement2 {
      * <p>
      * 编码⻛格：永远将函数的返回值命名为“result”，这样我⼀眼就能知道它的作⽤。
      */
-    private static int amountFor(Performances perf, Play play) {
+    private static int amountFor(Performance perf, Play play) {
         int result;
         switch (play.getType()) {
             case "tragedy":

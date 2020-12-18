@@ -1,6 +1,5 @@
-package com.dospyer.refactor.dto;
+package com.dospyer.refactor.bean;
 
-import com.dospyer.refactor.bean.Play;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
@@ -10,8 +9,7 @@ import lombok.NoArgsConstructor;
  */
 @Data
 @NoArgsConstructor
-public class PerformancesDto {
-    private Play playFor;
+public class Performance {
     private String playID;
     private int audience;
 }
