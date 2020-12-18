@@ -23,6 +23,16 @@ public class Statement16 {
      * 第⼀步是应⽤以⼦类取代类型码（362）引⼊⼦类，弃⽤类型代码。
      * 为此，我需要为演出计算器创建⼦类，并在 createStatementData 中获取对应的⼦类。
      * 要得到正确的⼦类，创建⼯⼚函数取代构造函数（334）。
+     * <p>
+     * 本章的冲欧股有3个较为重要的节点，分别是：
+     * 1.将原函数分解成⼀组嵌套的函数
+     * 2.应⽤拆分阶段（154）分离计算逻辑与输出格式化逻辑
+     * 3.为计算器引⼊多态性来处理计算逻辑。
+     * <p>
+     * 好代码的检验标准就是⼈们是否能轻⽽易举地修改它。
+     * 好代码应该直截了当：有⼈需要修改代码时，他们应能轻易找到修改点，应该能快速做出更改，⽽不易引⼊其他错误。
+     * ⼀个健康的代码库能够最⼤限度地提升我们的⽣产⼒，⽀持我们更快、更低成本地为⽤户添加新特性。
+     * 为了保持代码库的健康，就需要时刻留意现状与理想之间的差距，然后通过冲重构不断接近这个理想。
      */
     public static String statement(JSONObject invoice, Map<String, Play> playMap) {
         StatementData statementData = CreateStatementData.getStatementData(invoice, playMap);
