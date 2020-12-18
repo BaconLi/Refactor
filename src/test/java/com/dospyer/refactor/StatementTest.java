@@ -5,6 +5,8 @@ import com.alibaba.fastjson.JSONObject;
 import com.dospyer.refactor.bean.Play;
 import com.dospyer.refactor.evolution.step1.*;
 import com.dospyer.refactor.evolution.step2.*;
+import com.dospyer.refactor.evolution.step3.Statement15;
+import com.dospyer.refactor.evolution.step4.Statement16;
 import com.dospyer.refactor.util.Resource;
 import org.junit.Assert;
 import org.junit.Before;
@@ -63,6 +65,7 @@ public class StatementTest {
         Assert.assertEquals(message, Statement4.statement(invoice, playMap));
         Assert.assertEquals(message, Statement5.statement(invoice, playMap));
         Assert.assertEquals(message, Statement6.statement(invoice, playMap));
+
         Assert.assertEquals(message, Statement7.statement(invoice, playMap));
         Assert.assertEquals(message, Statement8.statement(invoice, playMap));
         Assert.assertEquals(message, Statement9.statement(invoice, playMap));
@@ -71,5 +74,8 @@ public class StatementTest {
         Assert.assertEquals(message, Statement12.statement(invoice, playMap));
         Assert.assertEquals(message, Statement13.statement(invoice, playMap));
         Assert.assertEquals(message, Statement14.statement(invoice, playMap));
+
+        Assert.assertEquals(message, Statement15.statement(invoice, playMap));
+        Assert.assertEquals(message, Statement16.statement(invoice, playMap));
     }
 }
